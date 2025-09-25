@@ -14,8 +14,11 @@ API проект для системы управления курсами и у
 - Python 3.8
 - Django 5.2
 - Django REST Framework
+- django-filter
 - PostgreSQL
 - Использование ViewSet и Generic Views DRF
+- Использование сериализаторов
+- Использование фильтрации
 
 ### Для работы приложения необходимо установить интерпретатор *poetry*:
 
@@ -39,6 +42,7 @@ poetry add django
 poetry add Pillow
 poetry add ipython
 pip install djangorestframework
+poetry add  django-filter
 ```
 ## Настройка окружения
 
