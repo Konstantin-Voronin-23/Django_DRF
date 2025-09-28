@@ -15,10 +15,12 @@ API проект для системы управления курсами и у
 - Django 5.2
 - Django REST Framework
 - django-filter
+- djangorestframework-simplejwt
 - PostgreSQL
 - Использование ViewSet и Generic Views DRF
 - Использование сериализаторов
 - Использование фильтрации
+- Использование JWT авторизации
 
 ### Для работы приложения необходимо установить интерпретатор *poetry*:
 
@@ -43,6 +45,7 @@ poetry add Pillow
 poetry add ipython
 pip install djangorestframework
 poetry add  django-filter
+poetry add djangorestframework-simplejwt
 ```
 ## Настройка окружения
 
