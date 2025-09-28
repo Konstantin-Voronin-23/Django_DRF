@@ -4,8 +4,8 @@ from .models import Payment, User
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ["email", "phone", "sity"]
-    list_filter = ["sity"]
+    list_display = ["email", "phone", "city"]
+    list_filter = ["city"]
     search_fields = ["email", "phone"]
 
 
