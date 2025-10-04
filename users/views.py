@@ -4,9 +4,16 @@ from django.contrib.auth import get_user_model
 
 from .models import Payment
 from .serializers import PaymentSerializer, UserSerializer, RegisterSerializer
+from .permissions import IsOwnerOrModeratorWithRestrictions
 
 
 User = get_user_model()
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsOwnerOrModeratorWithRestrictions]
 
 
 class RegisterView(generics.CreateAPIView):

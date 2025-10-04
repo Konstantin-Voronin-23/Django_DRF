@@ -24,7 +24,7 @@ class CourseViewSet(viewsets.ModelViewSet):
             permission_classes = [permissions.IsAuthenticated, ~IsModerator]
         elif self.action == 'destroy':
             permission_classes = [permissions.IsAuthenticated, IsOwner]
-        elif self.action in READ_ACTIONS:
+        elif self.action in read_actions:
             permission_classes = [permissions.IsAuthenticated]
         else:
             permission_classes = [permissions.IsAuthenticated]
@@ -33,7 +33,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.groups.filter(name=self.MODERATOR_GROUP).exists():
+        if user.groups.filter(name=self.moderator_group).exists():
             return Course.objects.all()
         return Course.objects.filter(owner=user)
 
@@ -92,7 +92,7 @@ class LessonRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method == "DELETE":
             permission_classes = [permissions.IsAuthenticated, IsOwner]
         elif self.request.method in self.read_update_methods:
-            permission_classes = [permissions.IsAuthenticated]
+            permission_classes = [permissions.IsAuthenticated, IsOwner]
         else:
             permission_classes = [permissions.IsAuthenticated]
 

@@ -2,11 +2,12 @@ from django.urls import include, path
 from users.apps import UsersConfig
 from rest_framework.routers import DefaultRouter
 
-from .views import PaymentViewSet, UserDetailView, RegisterView
+from .views import PaymentViewSet, UserDetailView, RegisterView, UserViewSet
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 router = DefaultRouter()
+router.register(r"users", UserViewSet, basename="user")
 router.register(r"payments", PaymentViewSet, basename="payment")
 
 app_name = UsersConfig.name

@@ -1,11 +1,15 @@
 from rest_framework import serializers
 from .models import Course, Lesson
+from .validators import validate_youtube
 
 
 class LessonSerializer(serializers.ModelSerializer):
     """Класс описывающий базовый сериалайзер урока"""
 
     owner = serializers.PrimaryKeyRelatedField(read_only=True)
+    video_url = serializers.URLField(
+        required=False, allow_blank=True, validators=[validate_youtube_link]
+    )
 
     class Meta:
         model = Lesson
@@ -24,9 +28,16 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     lessons_count = serializers.SerializerMethodField()
     lessons = LessonSerializer(many=True, read_only=True)
     owner = serializers.PrimaryKeyRelatedField(read_only=True)
+    is_subscribed = serializers.SerializerMethodField()
 
     def get_lessons_count(self, obj):
         return obj.lessons.count()
+
+    def get_is_subscribed(self, obj):
+        user = self.context["request"].user
+        if user.is_anonymous:
+            return False
+        return obj.subscriptions.filter(user=user).exists()
 
     class Meta:
         model = Course
