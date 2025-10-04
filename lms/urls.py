@@ -5,6 +5,7 @@ from .views import (
     CourseViewSet,
     LessonListCreateAPIView,
     LessonRetrieveUpdateDestroyAPIView,
+    SubscriptionToggleAPIView
 )
 
 
@@ -21,6 +22,7 @@ urlpatterns = [
         LessonRetrieveUpdateDestroyAPIView.as_view(),
         name="lesson-detail",
     ),
+    path("subscriptions/toggle/", SubscriptionToggleAPIView.as_view(), name="subscription-toggle",),
 ]
 
 urlpatterns += router.urls

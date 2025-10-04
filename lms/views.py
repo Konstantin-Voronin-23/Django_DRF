@@ -7,6 +7,7 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from .paginators import BasePagination
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -17,6 +18,7 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
+    pagination_class = BasePagination
 
     moderator_group = settings.MODERATOR_GROUP_NAME
 
@@ -51,6 +53,7 @@ class LessonListCreateAPIView(generics.ListCreateAPIView):
 
     queryset = Lesson.objects.all()
     serializer_class = LessonSerializer
+    pagination_class = BasePagination
 
     moderator_group = settings.MODERATOR_GROUP_NAME
 
@@ -112,3 +115,33 @@ class LessonRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 
     def _is_moderator(self):
         return self.request.user.groups.filter(name=self.moderator_group).exists()
+
+
+class SubscriptionToggleAPIView(APIView):
+    """API view для управления подпиской на курс.
+    Позволяет добавлять и удалять подписку текущего пользователя на указанный курс.
+    Реализует функционал переключения (toggle) подписки - если подписка существует,
+    она удаляется, если нет - создается
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        course_id = request.data.get("course_id")
+        if not course_id:
+            return Response(
+                {"error": "course_id не указан"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        course = get_object_or_404(Course, id=course_id)
+        subscription_qs = Subscription.objects.filter(user=user, course=course)
+
+        if subscription_qs.exists():
+            subscription_qs.delete()
+            message = "подписка удалена"
+        else:
+            Subscription.objects.create(user=user, course=course)
+            message = "подписка добавлена"
+
+        return Response({"message": message})
