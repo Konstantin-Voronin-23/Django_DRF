@@ -8,7 +8,7 @@ class LessonSerializer(serializers.ModelSerializer):
 
     owner = serializers.PrimaryKeyRelatedField(read_only=True)
     video_url = serializers.URLField(
-        required=False, allow_blank=True, validators=[validate_youtube_link]
+        required=False, allow_blank=True, validators=[validate_youtube]
     )
 
     class Meta:
