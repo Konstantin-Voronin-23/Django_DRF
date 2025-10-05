@@ -1,13 +1,10 @@
-from django.urls import path, include
-from lms.apps import LmsConfig
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from .views import (
-    CourseViewSet,
-    LessonListCreateAPIView,
-    LessonRetrieveUpdateDestroyAPIView,
-    SubscriptionToggleAPIView
-)
 
+from lms.apps import LmsConfig
+
+from .views import (CourseViewSet, LessonListCreateAPIView, LessonRetrieveUpdateDestroyAPIView,
+                    SubscriptionToggleAPIView)
 
 app_name = LmsConfig.name
 
@@ -22,7 +19,11 @@ urlpatterns = [
         LessonRetrieveUpdateDestroyAPIView.as_view(),
         name="lesson-detail",
     ),
-    path("subscriptions/toggle/", SubscriptionToggleAPIView.as_view(), name="subscription-toggle",),
+    path(
+        "subscriptions/toggle/",
+        SubscriptionToggleAPIView.as_view(),
+        name="subscription-toggle",
+    ),
 ]
 
 urlpatterns += router.urls

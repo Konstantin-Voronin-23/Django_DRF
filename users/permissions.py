@@ -1,5 +1,4 @@
 from rest_framework.permissions import BasePermission
-from rest_framework import permissions
 
 
 class IsModerator(BasePermission):
@@ -17,13 +16,14 @@ class IsOwner(BasePermission):
 
 
 class IsOwnerOrModeratorWithRestrictions(BasePermission):
-    """Класс проверяет доступы, владельцы: полный доступ | модераторы: чтение + редактирование, без создания/удаления"""
+    """Класс проверяет доступы, владельцы: полный доступ
+     модераторы: чтение + редактирование, без создания/удаления"""
 
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
             return False
 
-        if view.action == 'create' and IsModerator().has_permission(request, view):
+        if view.action == "create" and IsModerator().has_permission(request, view):
             return False
 
         return True
@@ -34,6 +34,6 @@ class IsOwnerOrModeratorWithRestrictions(BasePermission):
             return True
 
         if IsModerator().has_permission(request, view):
-            return view.action in ['retrieve', 'list', 'update', 'partial_update']
+            return view.action in ["retrieve", "list", "update", "partial_update"]
 
         return False
