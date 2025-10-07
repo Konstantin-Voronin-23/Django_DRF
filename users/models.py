@@ -1,8 +1,9 @@
-from django.db import models
-from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.base_user import BaseUserManager
 from django.conf import settings
-from lms.models import Lesson, Course
+from django.contrib.auth.base_user import BaseUserManager
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+
+from lms.models import Course, Lesson
 
 
 class UserManager(BaseUserManager):
@@ -25,6 +26,7 @@ class UserManager(BaseUserManager):
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superuser должен иметь is_superuser=True.")
         return self.create_user(email, password, **extra_fields)
+
 
 class User(AbstractUser):
     """Класс описывающий модель пользователя"""
@@ -49,11 +51,12 @@ class User(AbstractUser):
     objects = UserManager()
 
     class Meta:
-        verbose_name = 'Пользователь'
-        verbose_name_plural = 'Пользователи'
+        verbose_name = "Пользователь"
+        verbose_name_plural = "Пользователи"
 
     def __str__(self):
         return self.email
+
 
 class Payment(models.Model):
     """Класс описывающий модель оплаты"""
@@ -90,9 +93,7 @@ class Payment(models.Model):
 
     amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Сумма")
 
-    payment_method = models.CharField(
-        choices=PAYMENT_METHODS, max_length=10, verbose_name="Способ оплаты"
-    )
+    payment_method = models.CharField(choices=PAYMENT_METHODS, max_length=10, verbose_name="Способ оплаты")
 
     class Meta:
         verbose_name = "Платеж"

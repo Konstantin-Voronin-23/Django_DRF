@@ -1,4 +1,5 @@
 from django.db import models
+
 from config import settings
 
 
@@ -19,9 +20,7 @@ class Course(models.Model):
         null=True,
     )
 
-    description = models.TextField(
-        verbose_name="Описание курса", help_text="Введите описание курса"
-    )
+    description = models.TextField(verbose_name="Описание курса", help_text="Введите описание курса")
 
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -56,9 +55,7 @@ class Lesson(models.Model):
         help_text="Укажите название урока",
     )
 
-    description = models.TextField(
-        verbose_name="Описание урока", help_text="Введите описание урока"
-    )
+    description = models.TextField(verbose_name="Описание урока", help_text="Введите описание урока")
 
     preview = models.ImageField(
         upload_to="lms/preview_lesson/",
@@ -89,3 +86,20 @@ class Lesson(models.Model):
     class Meta:
         verbose_name = "Урок"
         verbose_name_plural = "Уроки"
+
+
+class Subscription(models.Model):
+    """Класс описывающий модель подписки на обновление курса для пользователя"""
+
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="subscriptions")
+    course = models.ForeignKey("Course", on_delete=models.CASCADE, related_name="subscriptions")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Подписка"
+        verbose_name_plural = "Подписки"
+        unique_together = ("user", "course")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.user} подписан на {self.course}"

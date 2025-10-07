@@ -7,20 +7,23 @@ API проект для системы управления курсами и у
 
 - **Course** — курсы с названием, превью, описанием.
 - **Lesson** — уроки, связанные с курсами, с названием, описанием, превью и видео ссылкой.
+- **Subscription** - подписка пользователя на курсы.
 
 Реализованы CRUD-операции (создание, чтение, обновление, удаление) для курсов и уроков.
 
-## Особенности
+# Особенности
 - Python 3.8
 - Django 5.2
 - Django REST Framework
 - django-filter
 - djangorestframework-simplejwt
 - PostgreSQL
+- Testcase
 - Использование ViewSet и Generic Views DRF
 - Использование сериализаторов
 - Использование фильтрации
 - Использование JWT авторизации
+- Использование валидации, пагинации и тестирование
 
 ### Для работы приложения необходимо установить интерпретатор *poetry*:
 
@@ -38,6 +41,8 @@ poetry add --group lint mypy
 poetry add --group lint black
 poetry add --group lint isort
 
+poetry add --group dev pytest
+poetry add coverage
 poetry add python-dotenv
 pip install psycopg2
 poetry add django
@@ -47,7 +52,7 @@ pip install djangorestframework
 poetry add  django-filter
 poetry add djangorestframework-simplejwt
 ```
-## Настройка окружения
+# Настройка окружения
 
 ```
 # Настройки Django
@@ -84,7 +89,7 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
-## Использование API
+# Использование API
 
 ### Курсы
 
@@ -102,6 +107,60 @@ python manage.py runserver
 - `PUT /lms/lessons/<id>/` - обновить урок
 - `DELETE /lms/lessons/<id>/` - удалить урок
 
-## Лицензия:
+# Тестирование
+
+<details>
+<summary><b>❗ LessonCRUDTestCase ❗</b></summary>
+
+### test_lesson_list_authenticated:
+  - Тест получения списка уроков аутентифицированным пользователем
+### test_lesson_list_unauthenticated:
+  - Тест получения списка уроков неаутентифицированным пользователем
+### test_lesson_create_authenticated:
+  - Тест создания урока аутентифицированным пользователем
+### test_lesson_create_unauthenticated:
+  - Тест создания урока неаутентифицированным пользователем
+### test_lesson_retrieve_authenticated:
+  - Тест получения деталей урока аутентифицированным пользователем
+### test_lesson_update_owner:
+  - Тест обновления урока владельцем
+### test_lesson_update_not_owner:
+  - Тест обновления урока не владельцем
+### test_lesson_delete_owner:
+  - Тест удаления урока владельцем
+### test_lesson_delete_not_owner:
+  - Тест удаления урока не владельцем
+
+</details>
+
+<details>
+<summary><b>❗ CourseViewSetTestCase ❗</b></summary>
+
+### test_course_list_authenticated:
+  - Тест получения списка курсов
+### test_course_retrieve_authenticated:
+  - Тест получения деталей курса
+### test_course_create_authenticated:
+  - Тест создания курса
+
+</details>
+
+<details>
+<summary><b>❗ SubscriptionTestCase ❗</b></summary>
+
+### test_subscription_create:
+  - Тест создания подписки
+### test_subscription_delete:
+  - Тест удаления подписки
+### test_subscription_toggle_unauthenticated:
+  - Тест переключения подписки неаутентифицированным пользователем
+### test_subscription_toggle_no_course_id:
+  - Тест переключения подписки без указания course_id
+
+</details>
+
+# Покрытие тестами 86%
+
+# Лицензия:
 
 Проект распространяется под [лицензией MIT](LICENSE)

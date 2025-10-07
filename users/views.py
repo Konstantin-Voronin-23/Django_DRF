@@ -1,12 +1,18 @@
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets, generics, permissions
 from django.contrib.auth import get_user_model
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, generics, permissions, viewsets
 
 from .models import Payment
-from .serializers import PaymentSerializer, UserSerializer, RegisterSerializer
-
+from .permissions import IsOwnerOrModeratorWithRestrictions
+from .serializers import PaymentSerializer, RegisterSerializer, UserSerializer
 
 User = get_user_model()
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsOwnerOrModeratorWithRestrictions]
 
 
 class RegisterView(generics.CreateAPIView):
@@ -31,6 +37,7 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
         user = serializer.save(is_active=True)
         user.set_password(user.password)
         user.save()
+
 
 class PaymentViewSet(viewsets.ModelViewSet):
     """Класс описывающий вьюсет для платежей с фильтрацией"""
