@@ -30,6 +30,14 @@ class Course(models.Model):
         help_text="Укажите владельца курса",
     )
 
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name="Цена курса",
+        help_text="Укажите стоимость курса",
+        default=0,
+    )
+
     def __str__(self):
         return self.title
 
@@ -92,7 +100,9 @@ class Subscription(models.Model):
     """Класс описывающий модель подписки на обновление курса для пользователя"""
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="subscriptions")
+
     course = models.ForeignKey("Course", on_delete=models.CASCADE, related_name="subscriptions")
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

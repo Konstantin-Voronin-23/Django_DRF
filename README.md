@@ -17,6 +17,7 @@ API проект для системы управления курсами и у
 - Django REST Framework
 - django-filter
 - djangorestframework-simplejwt
+- drf_spectacular
 - PostgreSQL
 - Testcase
 - Использование ViewSet и Generic Views DRF
@@ -24,6 +25,7 @@ API проект для системы управления курсами и у
 - Использование фильтрации
 - Использование JWT авторизации
 - Использование валидации, пагинации и тестирование
+- Использование автодокументации (spectacular) и интеграция API (STRIPE)
 
 ### Для работы приложения необходимо установить интерпретатор *poetry*:
 
@@ -51,6 +53,8 @@ poetry add ipython
 pip install djangorestframework
 poetry add  django-filter
 poetry add djangorestframework-simplejwt
+poetry add drf-spectacular
+poetry add stripe
 ```
 # Настройка окружения
 
@@ -73,6 +77,9 @@ EMAIL_HOST_PASSWORD=пароль-приложения
 # Дополнительные настройки
 LOCATION=redis://127.0.0.1:6379
 
+# Настройки интеграции STRIPE.com
+STRIPE_SECRET_KEY=ваш API SECRET_KEY
+STRIPE_PUBLISHABLE_KEY=ваш API PUBLISHABLE_KEY
 ```
 
 Применить миграции и создать суперпользователя:

@@ -17,7 +17,7 @@ class IsOwner(BasePermission):
 
 class IsOwnerOrModeratorWithRestrictions(BasePermission):
     """Класс проверяет доступы, владельцы: полный доступ
-     модераторы: чтение + редактирование, без создания/удаления"""
+    модераторы: чтение + редактирование, без создания/удаления"""
 
     def has_permission(self, request, view):
         if not request.user.is_authenticated:
