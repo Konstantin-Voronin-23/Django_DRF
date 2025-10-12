@@ -9,6 +9,7 @@ from users.permissions import IsModerator, IsOwner
 from .models import Course, Lesson, Subscription
 from .paginators import BasePagination
 from .serializers import CourseSerializer, LessonSerializer
+from .tasks import send_course_update_email
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -46,6 +47,10 @@ class CourseViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+    def perform_update(self, serializer):
+        course = serializer.save()
+        send_course_update_email.delay(course.id)
 
 
 class LessonListCreateAPIView(generics.ListCreateAPIView):
@@ -114,6 +119,11 @@ class LessonRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 
     def _is_moderator(self):
         return self.request.user.groups.filter(name=self.moderator_group).exists()
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.check_object_permissions(request, instance)
+        return self.destroy(request, *args, **kwargs)
 
 
 class SubscriptionToggleAPIView(APIView):
