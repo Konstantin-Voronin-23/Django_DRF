@@ -1,5 +1,0 @@
-psycopg2-binary==2.9.10
-types-psycopg2==2.9.21.20250915
-types-requests==2.32.4.20250913
-djangorestframework==3.16.1
-django-celery-beat==2.8.1
