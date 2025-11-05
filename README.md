@@ -20,12 +20,14 @@ API проект для системы управления курсами и у
 - drf_spectacular
 - PostgreSQL
 - Testcase
+- Docker
 - Использование ViewSet и Generic Views DRF
 - Использование сериализаторов
 - Использование фильтрации
 - Использование JWT авторизации
 - Использование валидации, пагинации и тестирование
 - Использование автодокументации (spectacular) и интеграция API (STRIPE)
+- Docker Compose
 
 ### Для работы приложения необходимо установить интерпретатор *poetry*:
 
@@ -64,10 +66,10 @@ SECRET_KEY=ваш-secret-key
 DEBUG=True
 
 # База данных PostgreSQL
-DB_NAME=mailing
+DB_NAME=lms
 DB_USER=postgres
 DB_PASSWORD=ваш-пароль
-DB_HOST=localhost
+DB_HOST=db
 DB_PORT=5432
 
 # Настройки почты (Mail.ru)
@@ -75,7 +77,7 @@ EMAIL_HOST_USER=ваш-email@mail.ru
 EMAIL_HOST_PASSWORD=пароль-приложения
 
 # Дополнительные настройки
-LOCATION=redis://127.0.0.1:6379
+LOCATION=redis://redis:6379/0
 
 # Настройки интеграции STRIPE.com
 STRIPE_SECRET_KEY=ваш API SECRET_KEY
@@ -97,6 +99,45 @@ python manage.py runserver
 ```
 
 # Использование API
+
+##  Быстрый старт (Docker Compose)
+1. Клонировать репозиторий:
+
+~~~
+git clone https://github.com/Konstantin-Voronin-23/Django_DRF.git
+cd DRF
+~~~
+
+2. Заполнить файл .env:
+
+* Скопируйте .env.example и пропишите конфиг доступа к БД, Redis, секретные ключи.
+
+3. Запустить проект одной командой:
+
+~~~
+docker-compose up --build
+~~~
+
+4. Готово!
+
+* Откройте http://localhost:8000 и пользуйтесь API.
+
+<details>
+<summary><b>❗ Проверка сервисов и диагностика ❗</b></summary>
+
+### Celery Worker:
+  - docker-compose logs celery_worker
+  - celery@... ready. Connected to redis://redis:6379/0
+### Celery Beat:
+  - docker-compose logs celery_beat
+  - beat: Starting... DatabaseScheduler: Schedule changed
+### PostgreSQL:
+  - Войти внутрь контейнера
+  - docker exec -it lms psql -U postgres -d lms
+  - Проверить пользователей
+  - SELECT id, username, email, last_login, is_active FROM auth_user;
+
+</details>
 
 ### Курсы
 
