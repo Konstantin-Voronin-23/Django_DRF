@@ -28,12 +28,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install poetry
-          # Если нет poetry.lock, устанавливаем зависимости напрямую
-          if [ -f "pyproject.toml" ]; then
-            poetry export -f requirements.txt --output requirements.txt --without-hashes
-            pip install -r requirements.txt
-          else
-            pip install -r requirements.txt
+          poetry install --no-root --no-interaction
+
+          # Дополнительные пакеты
+          if [ -f "extra_requirements.txt" ]; then
+            pip install -r extra_requirements.txt
           fi
 
       - name: Run migrations
