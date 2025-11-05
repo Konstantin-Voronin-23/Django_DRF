@@ -28,35 +28,30 @@ API проект для системы управления курсами и у
 - Использование валидации, пагинации и тестирование
 - Использование автодокументации (spectacular) и интеграция API (STRIPE)
 - Docker Compose
+- Nginx 
+- CI/CD
+- GitHub Actions
 
-### Для работы приложения необходимо установить интерпретатор *poetry*:
-
-```pip install --user poetry```
-
-### Так же клонируйте репозиторий:
-
-```git clone https://github.com/Konstantin-Voronin-23/Django_DRF.git```
-
-### Для работы проекта воспользуйтесь командами для установок зависимостей:
+# Зависимости (requirements.txt)
 
 ```
-poetry add --group lint flake8
-poetry add --group lint mypy
-poetry add --group lint black
-poetry add --group lint isort
-
-poetry add --group dev pytest
-poetry add coverage
-poetry add python-dotenv
-pip install psycopg2
-poetry add django
-poetry add Pillow
-poetry add ipython
-pip install djangorestframework
-poetry add  django-filter
-poetry add djangorestframework-simplejwt
-poetry add drf-spectacular
-poetry add stripe
+Django==5.2.6
+djangorestframework==3.16.1
+django-filter==25.1
+djangorestframework_simplejwt==5.5.1
+django-extensions==4.1
+drf-spectacular==0.29.0
+django-celery-beat==2.8.1
+celery==5.3.6
+eventlet==0.34.1
+python-dotenv==1.1.1
+psycopg2-binary==2.9.10
+pillow==11.3.0
+redis==5.0.3
+black==25.1.0
+pytest-django==4.11.1
+coverage==7.10.7
+stripe==13.0.1
 ```
 # Настройка окружения
 
@@ -84,33 +79,22 @@ STRIPE_SECRET_KEY=ваш API SECRET_KEY
 STRIPE_PUBLISHABLE_KEY=ваш API PUBLISHABLE_KEY
 ```
 
-Применить миграции и создать суперпользователя:
-
-```
-python manage.py migrate
-python manage.py createsuperuser
-```
-
-
-Запустить сервер разработки:
-
-```
-python manage.py runserver
-```
-
 # Использование API
 
 ##  Быстрый старт (Docker Compose)
-1. Клонировать репозиторий:
 
+1. Клонировать репозиторий:
 ~~~
 git clone https://github.com/Konstantin-Voronin-23/Django_DRF.git
-cd DRF
+cd Django_DRF
 ~~~
 
-2. Заполнить файл .env:
-
-* Скопируйте .env.example и пропишите конфиг доступа к БД, Redis, секретные ключи.
+2. Заполните переменные окружения:
+~~~
+cp .env.example .env
+nano .env
+~~~
+* Скопируйте .env.sample и пропишите конфиг доступа к БД, Redis, секретные ключи.
 
 3. Запустить проект одной командой:
 
@@ -139,7 +123,7 @@ docker-compose up --build
 
 </details>
 
-### Курсы
+## Курсы
 
 - `GET /lms/courses/` - получить список курсов
 - `POST /lms/courses/` - создать новый курс
@@ -147,7 +131,7 @@ docker-compose up --build
 - `PUT /lms/courses/<id>/` - обновить курс
 - `DELETE /lms/courses/<id>/` - удалить курс
 
-### Уроки
+## Уроки
 
 - `GET /lms/lessons/` - получить список уроков
 - `POST /lms/lessons/` - создать новый урок
@@ -156,6 +140,12 @@ docker-compose up --build
 - `DELETE /lms/lessons/<id>/` - удалить урок
 
 # Тестирование
+
+Как запускать тесты?
+~~~
+docker compose run web pytest
+~~~
+Все основные компоненты покрыты unit и интеграционными тестами.
 
 <details>
 <summary><b>❗ LessonCRUDTestCase ❗</b></summary>
@@ -206,6 +196,156 @@ docker-compose up --build
   - Тест переключения подписки без указания course_id
 
 </details>
+
+# Настройка удалённого сервера
+
+1. Установите необходимые пакеты на сервере:
+
+~~~
+sudo apt update
+sudo apt install python3 python3-pip python3-venv nginx docker docker-compose git
+~~~
+
+2. Настройте SSH-доступ с помощью ключей для безопасного подключения, закройте все ненужные порты с помощью firewall.
+
+3. Подготовьте проект:
+
+* Клонируйте репозиторий на сервер:
+
+~~~
+git clone https://github.com/Konstantin-Voronin-23/Django_DRF.git
+cd Django_DRF
+~~~
+
+* Создайте и заполните .env файл скопировав шаблон:
+
+~~~
+cp .env.sample .env
+nano .env
+~~~
+
+4. Запустите миграции и сборку статики (при необходимости):
+
+~~~
+docker compose run web python manage.py migrate
+docker compose run web python manage.py collectstatic --noinput
+~~~
+
+5. Запустите приложение в Docker:
+
+~~~
+docker compose up -d --build
+~~~
+
+# Автоматизация деплоя через GitHub Actions
+1. В репозитории создайте файл workflow в .github/workflows/ci-cd.yml.
+
+2. Конфигурируйте workflow для запуска тестов и деплоя (пример ниже):
+
+```
+name: CI/CD Pipeline
+
+on: push
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    env:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      DEBUG: "True"
+      DB_ENGINE: "django.db.backends.postgresql"
+      DB_NAME: "test_db"
+      DB_USER: "postgres"
+      DB_PASSWORD: "postgres"
+      DB_HOST: "localhost"
+      DB_PORT: "5432"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run migrations
+        run: |
+          python manage.py migrate
+
+      - name: Run tests
+        run: |
+          python manage.py test
+
+  deploy:
+    needs: test
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            cd ~/Django_DRF/Django_DRF
+            git pull origin main
+            docker compose down
+            docker compose pull
+            docker compose up -d --build
+
+```
+
+3. Добавьте необходимые секреты в GitHub Secrets:
+
+SERVER_HOST, SERVER_USER, SERVER_SSH_KEY, SERVER_PORT, SECRET_KEY
+
+4. Проверка результатов
+После пуша в репозиторий тесты выполняются автоматически.
+
+При успешных тестах проект деплоится на сервер.
+
+При ошибках в тестах деплой не происходит.
+
+# Логирование и мониторинг
+* Логи приложения доступны через
+
+~~~
+docker compose logs web
+~~~
+
+* Gunicorn логирует события старта, ошибок и работы воркеров.
+
+* Nginx логирует HTTP-запросы и ошибки, логи доступны через
+
+~~~
+docker compose logs nginx
+~~~
+
+* Для продакшена рекомендуется настроить внешние системы логирования и мониторинга (Prometheus, ELK стек или другое)
 
 # Покрытие тестами 86%
 
