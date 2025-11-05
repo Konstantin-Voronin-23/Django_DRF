@@ -3,7 +3,7 @@ djangorestframework==3.16.1
 django-filter==25.1
 djangorestframework_simplejwt==5.5.1
 django-extensions==4.1
-drf-spectacular==0.28.1
+drf-spectacular==0.29.0
 django-celery-beat==2.6.0
 celery==5.3.6
 eventlet==0.34.1
